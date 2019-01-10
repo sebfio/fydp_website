@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ShopTrac&#39;s Blog</title>
+	<meta name="viewport" content="width=device-width" />
+	<link rel="stylesheet" type="text/css" href="http://sebfio.github.io/fydp_websitecss/style.css" />
+</head>
+<body>
+
+<h1>
+	<a href="http://sebfio.github.io/fydp_website">ShopTrac&#39;s Blog</a>
+	<label class="last_update">Updated on 2013-08-31 00:00:00</label>
+</h1>
+
+
+<ol class="timeline">
+	<li class="tl-node">
+		<div class="tl-stamp">2013-07-28 00:00:00</div>
+		<div class="tl-content">Infra as a Repo: Using Vagrant and Salt Stack to deploy Nginx on DigitalOcean</div>
+			
+
+<p>I believe that managing your infrastructure can and should be fun. Recently I have been toying around with
+<a href="http://vagrantup.com">Vagrant</a> and <a href="http://saltstack.com/">Salt Stack</a> to make this a reality. This weekend,
+I managed to combine these tools to automatically provision a new Nginx server on
+<a href="https://www.digitalocean.com/?refcode=8d8ff680bec5">Digital Ocean</a>.</p>
+
+<p>This in itself is nothing new - the interesting part is where I have published the entire script as a Github
+repository without sacrificing any security.</p>
+
+<p>If you&rsquo;re not interested in the story and just want to go and reproduce my infrastructure, go ahead and
+<a href="https://github.com/publysher/infra-example-nginx/tree/v1.0">fork my repo on Github</a>.</p>
+
+<h2 id="the-base-vagrantfile">The base Vagrantfile</h2>
+
+<p>I began by using <a href="http://vagrantup.com">Vagrant</a>, an exciting tool that abstracts away all VM hassles into a single
+configuration file. Using a VirtualBox image I created earlier using <a href="https://github.com/jedi4ever/veewee">Veewee</a>,
+the following Vagrantfile allowed me to spin up and destroy a local Debian Wheezy VM.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span>pre<span style="color:#f92672">&gt;&lt;</span>code<span style="color:#f92672">&gt;</span><span style="color:#66d9ef">Vagrant</span><span style="color:#f92672">.</span>configure(<span style="color:#f92672">&amp;</span>quot;<span style="color:#ae81ff">2</span><span style="color:#f92672">&amp;</span>quot;) <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>config<span style="color:#f92672">|</span>
+
+  <span style="color:#75715e"># Default configuration for Virtualbox</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>box <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;debian-wheezy-64&#39;</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>box_url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.dropbox.com/s/00ndb5ea4k8hyoy/debian-wheezy-64.box&#39;</span>
+
+  <span style="color:#75715e"># Name the VM</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>define <span style="color:#e6db74">:nginx01</span>
+
+<span style="color:#66d9ef">end</span>
+<span style="color:#f92672">&lt;</span><span style="color:#e6db74">/code&gt;&lt;/</span>pre<span style="color:#f92672">&gt;</span></code></pre></div>
+
+<p>Just by having this simple file, I can now manage a VM with the commands <code>vagrant up</code>,
+<code>vagrant ssh</code> and <code>vagrant destroy</code>.</p>
+
+<h2 id="salting-the-image">Salting the image</h2>
+
+<p>Starting a VM like this is already a sweet experience, but it gets better. The
+<a href="https://github.com/saltstack/salty-vagrant">salty-vagrant</a> plugin allows me to automatically install and configure
+software on the VM using the super sweet Salt Stack framework.</p>
+
+<p>Yes, I know, Vagrant supports Puppet and Chef provisioning out of the box, but some time ago I decided that I don&rsquo;t
+just want provisioning for my infrastructure. I want a remote execution framework as well. And that&rsquo;s how you end up
+with Salt Stack.</p>
+
+<p>Anyway, the following lines in my Vagrantfile were enough to enable Salt Stack:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span>pre<span style="color:#f92672">&gt;&lt;</span>code<span style="color:#f92672">&gt;</span><span style="color:#75715e"># Mount salt roots, so we can do masterless setup</span>
+config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>synced_folder <span style="color:#e6db74">&#39;salt/roots/&#39;</span>, <span style="color:#e6db74">&#39;/srv/&#39;</span>
+
+<span style="color:#75715e"># Forward 8080 to nginx</span>
+config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">:forwarded_port</span>, <span style="color:#e6db74">guest</span>: <span style="color:#ae81ff">80</span>, <span style="color:#e6db74">host</span>: <span style="color:#ae81ff">8080</span>
+
+<span style="color:#75715e"># Provisioning #1: install salt stack</span>
+config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>,
+    <span style="color:#e6db74">:inline</span> <span style="color:#f92672">=&amp;</span>gt; <span style="color:#e6db74">&#39;wget -O - http://bootstrap.saltstack.org | sudo sh&#39;</span>
+
+<span style="color:#75715e"># Provisioning #2: masterless highstate call</span>
+config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:salt</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>salt<span style="color:#f92672">|</span>
+    salt<span style="color:#f92672">.</span>minion_config <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;salt/minion&#39;</span>
+    salt<span style="color:#f92672">.</span>run_highstate <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+    salt<span style="color:#f92672">.</span>verbose <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+<span style="color:#66d9ef">end</span>
+<span style="color:#f92672">&lt;</span><span style="color:#e6db74">/code&gt;&lt;/</span>pre<span style="color:#f92672">&gt;</span></code></pre></div>
+
+<p>This, and some Salt files of course. They can be found in my
+<a href="https://github.com/publysher/infra-example-nginx/tree/v1.0">Github repo</a> under <code>salt/roots</code>. In this case,
+the Salt files just install and configure a simple Nginx server, but it&rsquo;s the principle that counts.</p>
+
+<p>Also note that technically, the <code>vagrant-salt-plugin</code> is able to install Salt for you as well. However, for some
+reason the plugin has decided that this requires a complete recompile of <code>python-zmq</code>, which I am not interested in.
+So I use the official method of installing Salt before I start the plugin.</p>
+
+<p>And now, after doing a <code>vagrant up</code>, the VM is automatically provisioned with a running Nginx server, accessible
+through <a href="http://localhost:8080">http://localhost:8080</a>.</p>
+
+<h2 id="adding-digital-ocean">Adding Digital Ocean</h2>
+
+<p>Once again a sweet experience, but hosting my infrastructure on my development machine is not really future-proof.
+Which brings me to the next part: deploying the exact same configuration on a real VPS.</p>
+
+<p>Given <a href="https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins">the current list of available Vagrant plugins</a>, and the fact that I don&rsquo;t want to spend too much
+on this right now, I decided on using <a href="https://www.digitalocean.com/?refcode=8d8ff680bec5">Digital Ocean</a>. They offer
+nice small SSD-backed VPSs for only $5,- a month. And you pay by the hour. Which means that this entire exercise has
+cost me $0.05 so far.</p>
+
+<p>The README of the <a href="https://github.com/smdahlen/vagrant-digitalocean">vagrant-digitalocean</a> plugin is self-explanatory,
+but it has one major flaw: it puts your client ID and API key in the main Vagrantfile. Call me old-fashioned, but I
+don&rsquo;t like sharing this information on Github.</p>
+
+<p>Luckily, Vagrant has <a href="http://docs.vagrantup.com/v2/vagrantfile/index.html">a complete settings-merging process</a> in
+place, which meant I could simply create the following <code>~/.vagrant.d/Vagrantfile</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span>pre<span style="color:#f92672">&gt;&lt;</span>code<span style="color:#f92672">&gt;</span><span style="color:#66d9ef">Vagrant</span><span style="color:#f92672">.</span>configure(<span style="color:#f92672">&amp;</span>quot;<span style="color:#ae81ff">2</span><span style="color:#f92672">&amp;</span>quot;) <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>config<span style="color:#f92672">|</span>
+    config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provider <span style="color:#e6db74">:digital_ocean</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>provider, override<span style="color:#f92672">|</span>
+        override<span style="color:#f92672">.</span>ssh<span style="color:#f92672">.</span>private_key_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;~/.ssh/id_dsa&#39;</span>
+        override<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>box_url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box&#39;</span>
+
+        provider<span style="color:#f92672">.</span>client_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;MY-SECRET-ID&#39;</span>
+        provider<span style="color:#f92672">.</span>api_key <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;MY-SUPER-SECRET-API-KEY&#39;</span>
+    <span style="color:#66d9ef">end</span>
+<span style="color:#66d9ef">end</span>
+<span style="color:#f92672">&lt;</span><span style="color:#e6db74">/code&gt;&lt;/</span>pre<span style="color:#f92672">&gt;</span></code></pre></div>
+
+<p>Note the <code>override.vm.box_url</code> setting – my beautiful preinstalled Wheezy VM is useless on Digital Ocean, so I just use
+their dummy box. Always.</p>
+
+<p>Having set up my private information, I just needed to add the following lines to my main Vagrantfile:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span>pre<span style="color:#f92672">&gt;&lt;</span>code<span style="color:#f92672">&gt;</span><span style="color:#75715e"># VM-specific digital ocean config</span>
+config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provider <span style="color:#e6db74">:digital_ocean</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>provider<span style="color:#f92672">|</span>
+    provider<span style="color:#f92672">.</span>image <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Debian 7.0 x64&#39;</span>
+    provider<span style="color:#f92672">.</span>region <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;New York 1&#39;</span>
+    provider<span style="color:#f92672">.</span>size <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;512MB&#39;</span>
+<span style="color:#66d9ef">end</span>
+<span style="color:#f92672">&lt;</span><span style="color:#e6db74">/code&gt;&lt;/</span>pre<span style="color:#f92672">&gt;</span></code></pre></div>
+
+<h2 id="deploying-the-image">Deploying the image</h2>
+
+<p>The proof is in the pudding (apparently), so with great trepidation I did a <code>vagrant up --provider digital_ocean</code>.</p>
+
+<p>You should try it yourself – this was really quite exciting. Just a few minutes later, I could access my professionally
+provisioned Nginx VPS on <a href="http://192.241.146.220">http://192.241.146.220</a>. Without me ever SSH-ing to the server itself.</p>
+
+<p>Mission Accomplished!</p>
+
+<p>Or was it?</p>
+
+<h2 id="managing-the-deployed-image">Managing the deployed image</h2>
+
+<p>At the moment, Vagrant does not support multiple providers at the same time. So in order to start a local VM
+(<code>vagrant up</code>), you should do a <code>vagrant destroy</code> on the current provider first.</p>
+
+<p>This is not good. The <code>vagrant destroy</code> command does exactly what it says, and it destroys your VPS.
+Which is sort of missing the point.</p>
+
+<p>In order to switch back to local development, you should remove the <code>.vagrant/machines/$NAME/digital_ocean/id</code> file.
+This makes Vagrant forget everything it knows about your VPS and <code>vagrant up</code> will start a local VM as expected.</p>
+
+<p>And now for the nice part: the <code>vagrant-digitalocean</code> plugin actually does not care about this.
+The next time you do a <code>vagrant up --provider digital_ocean</code>, it will detect your existing VPS by name, and
+automatically reinstate the <code>id</code>-file.</p>
+
+<h2 id="reprovisioning-the-image">Reprovisioning the image</h2>
+
+<p>Provisioning a server is nice, but being able to reprovision a running server is even better. There are three ways to
+do this.</p>
+
+<p>The first one is <code>vagrant provision</code>, which just runs the provisioning scripts again. This is great for incremental
+updates, and it keeps your server online, but it does not guarantee that provisioning works from an initial state as
+well.</p>
+
+<p>The second one is <code>vagrant destroy ; vagrant up --provider digital_ocean</code>. This will recreate your VPS from the ground
+up, ensuring a future-proof provisioning. Unfortunately, Digital Ocean does not guarantee that this will give you the
+same IP address. You will also occur a few minutes of downtime.</p>
+
+<p>The final one is <code>vagrant rebuild</code>, which does guarantee the same IP address and seems to be functionally equivalent
+to the previous method. This too gives you a few minutes of downtime.</p>
+
+<h2 id="one-server-does-not-an-infrastructure-make">One server does not an infrastructure make</h2>
+
+<p>All of this has of course merely touched the surface of real infrastructure provisioning. Because I don&rsquo;t let Digital
+Ocean manage my DNS, I have to manually update my records, the server does not do any monitoring, the current
+configuration is not really exciting, and using a masterless Salt minion setup sort of defeats the purpose of using
+Salt.</p>
+
+<p>So what.</p>
+
+<p>This exercise has shown me that having your infra as a repo is a viable position, and I am determined to continue down
+this path. It might even result in another blog post.</p>
+
+	</li>
+</ol>
+
+
+</body>
+</html>

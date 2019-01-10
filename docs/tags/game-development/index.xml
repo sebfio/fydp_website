@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Game Development on ShopTrac&#39;s Blog</title>
+    <link>http://sebfio.github.io/fydp_website/tags/game-development/</link>
+    <description>Recent content in Game Development on ShopTrac&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 04 Aug 2012 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://sebfio.github.io/fydp_website/tags/game-development/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: Do the Wave</title>
+      <link>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-10-do-wave/</link>
+      <pubDate>Sat, 04 Aug 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-10-do-wave/</guid>
+      <description>Last week I talked explained how to lose. This week, I&amp;rsquo;ll talk about winning. After a short introduction on what it means to win a Tower Defense level, the tutorial will explain how to have multiple waves and how to recognize that the player has won.
+The result of this part can be seen here; you can also find it on StencylForge under the name &amp;ldquo;Publysher – TD Tutorial part #10&amp;rdquo;.</description>
+    </item>
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: Staying Alive</title>
+      <link>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-9-staying-alive/</link>
+      <pubDate>Mon, 11 Jun 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-9-staying-alive/</guid>
+      <description>Our Tower Defense game is slowly turning into a real game, but there is still a lot of work to do. For example, most games are about winning, and therefore about losing. In this part of the tutorial I&amp;rsquo;m going to work on losing the game. For now, winning will remain a promise :)
+The result of this part can be seen here; you can also find it on StencylForge under the name &amp;ldquo;Publysher – TD Tutorial #9&amp;rdquo;.</description>
+    </item>
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: Satisfaction and Scoring</title>
+      <link>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-8-satisfaction/</link>
+      <pubDate>Mon, 28 May 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-8-satisfaction/</guid>
+      <description>In the previous post I allowed the player to place his own towers to shoot the enemies. This was a great step forward, but one thing was lacking: the satisfaction after the kill. Daniel Cook from LostGarden has a great article on feedback loops, and I want some of that.
+So, in this post I will add some visual feedback on killing enemies, and introduce the concept of Scores.</description>
+    </item>
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: Creating Towers</title>
+      <link>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-7-creating-towers/</link>
+      <pubDate>Sat, 26 May 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-7-creating-towers/</guid>
+      <description>Until now, my TD game has been a proof of concept, mainly concerned with programming. The end result so far has been something to look at, without any user interaction at all.
+It&amp;rsquo;s time to change this.
+In this episode I will give the player the possibility to add towers on predefined spots. You will learn something about gaming trade-offs and GUI programming.
+The result can be seen here; you can also find it on StencylForge under the name &amp;ldquo;Publysher - TD Tutorial #7&amp;rdquo;.</description>
+    </item>
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: Follow the Path</title>
+      <link>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-6-follow-path/</link>
+      <pubDate>Fri, 11 May 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-6-follow-path/</guid>
+      <description>Today it&amp;rsquo;s time to change our enemies from harmless wandering puppets into goal-oriented path-following critters. I will introduce the concept of paths, following paths and spawning, and I will guide you through the creation of a new complex behavior.
+The result can be seen here; you can also find it on StencylForge under the name &amp;ldquo;Publysher - TD Tutorial #6&amp;rdquo;.
+The Art of Using Placeholder Art You might have frowned at the quality of the artwork so far.</description>
+    </item>
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: Choosing Your Target</title>
+      <link>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-5-choosing-your/</link>
+      <pubDate>Thu, 10 May 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-5-choosing-your/</guid>
+      <description>Up until now, my towers have been somewhat stupid: enemies were only shot when they first approached the tower. After that, the enemies could have a picnic in front of said tower without anything happening. In real life Tower Defense combat situations this is of course unacceptable.
+In this part, I will modify my towers to regularly shoot at enemies within range, just like real TD games. I will introduce list attributes, strategies and a bit of custom code.</description>
+    </item>
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: Shooting Bullets</title>
+      <link>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-4-shooting/</link>
+      <pubDate>Wed, 09 May 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-4-shooting/</guid>
+      <description>So far my towers have been shooting at enemies with invisible death rays. This is of course state-of-the-art weaponry, but most players prefer a bit of feedback.
+In this part, I will replace the invisible death rays by animated bullets. Along the way, you might learn a bit about basic game mathematics.
+The result can be seen here; you can also download it from StencylForge under the name &amp;ldquo;Publysher – TD Tutorial #4&amp;rdquo;.</description>
+    </item>
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: Getting Healthy</title>
+      <link>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-3-getting-healthy/</link>
+      <pubDate>Wed, 25 Apr 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-3-getting-healthy/</guid>
+      <description>In the previous posts, I created a very basic Tower Defense Game with wandering enemies and pre-placed towers that can kill enemies. In most TD games, enemies are not killed outright but damaged. In this part, I will introduce the pre-shipped Health Manager and use it to make the towers deal damage.
+I will also create a new behavior to show visual feedback on damage. This will include the concept of &amp;ldquo;Run later&amp;rdquo; blocks which can be very very tricky.</description>
+    </item>
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: Adding Towers</title>
+      <link>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-2-adding-towers/</link>
+      <pubDate>Tue, 24 Apr 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/stencyl-tower-defense-2-adding-towers/</guid>
+      <description>In the previous post, I created the basics for a Tower Defense Game. In this part, I will add two towers that are able to kill those nasty enemies.
+The result can be seen here; you can also download it from StencylForge under the name &amp;ldquo;Publysher - TD Tutorial #2&amp;rdquo;.
+Towers Towers are the heart of any Tower Defense game. The player places them at strategical positions on the battle field.</description>
+    </item>
+    
+    <item>
+      <title>Stencyl Tower Defense Tutorial: The Humble Beginnings</title>
+      <link>http://sebfio.github.io/fydp_website/posts/tutorial-creating-tower-defense-game-in/</link>
+      <pubDate>Sun, 22 Apr 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://sebfio.github.io/fydp_website/posts/tutorial-creating-tower-defense-game-in/</guid>
+      <description>In this tutorial, I will show you how to create a simple Tower Defense game in StencylWorks. The version I will use is 2.0. This tutorial is aimed at people who have completed the crash courses on the StencylWorks website and have a basic understanding of how StencylWorks works.
+In this part, I will create a simple scene with wandering enemies. I will introduce a custom behavior and use some preshipped behaviors to make it seem like a &amp;ldquo;real&amp;rdquo; game.</description>
+    </item>
+    
+  </channel>
+</rss>

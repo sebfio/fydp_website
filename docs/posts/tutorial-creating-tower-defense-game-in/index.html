@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ShopTrac&#39;s Blog</title>
+	<meta name="viewport" content="width=device-width" />
+	<link rel="stylesheet" type="text/css" href="http://sebfio.github.io/fydp_websitecss/style.css" />
+</head>
+<body>
+
+<h1>
+	<a href="http://sebfio.github.io/fydp_website">ShopTrac&#39;s Blog</a>
+	<label class="last_update">Updated on 2013-08-31 00:00:00</label>
+</h1>
+
+
+<ol class="timeline">
+	<li class="tl-node">
+		<div class="tl-stamp">2012-04-22 00:00:00</div>
+		<div class="tl-content">Stencyl Tower Defense Tutorial: The Humble Beginnings</div>
+			
+
+<p>In this tutorial, I will show you how to create a simple Tower Defense game in
+<a href="http://www.stencyl.com/">StencylWorks</a>.
+The version I will use is 2.0. This tutorial is aimed at people who have completed the
+<a href="http://www.stencyl.com/help/view/crash-course/">crash courses</a> on the
+StencylWorks website and have a basic understanding of how StencylWorks works.</p>
+
+<p>In this part, I will create a simple scene with wandering enemies. I will introduce a custom behavior
+and use some preshipped behaviors to make it seem like a &ldquo;real&rdquo; game.</p>
+
+<p><a href="http://www.stencyl.com/game/play/12338">The final result can be played here</a>; it can also be downloaded from
+StencylForge under the name &ldquo;Publysher - TD Tutorial #1&rdquo;.</p>
+
+<h2 id="on-tower-defense-games">On Tower Defense Games</h2>
+
+<p>Tower Defense games are a popular gaming genre. The player tries to prevent waves of enemies from passing through
+his screen by placing towers at strategical position. These towers will automatically shoot at enemies, eventually
+killing them. When enough enemies have passed through the screen, the player looses.</p>
+
+<p>Most Tower Defense games include many more features such as upgrading your tower. Who knows, during our tutorial I
+might actually implement some of those features.</p>
+
+<p>Popular Tower Defense games include <a href="http://www.kongregate.com/games/Ironhidegames/kingdom-rush">Kingdom Rush</a>
+and <a href="http://www.kongregate.com/games/gameinabottle/gemcraft-labyrinth">GemCraft Labyrinth</a>.</p>
+
+<h2 id="starting-up">Starting Up</h2>
+
+<p>As usual, begin by starting Stencyl and create a new game. I&rsquo;ve created a new Web game of 640x480 pixels.
+After creating your new game, you should expect to see this:</p>
+
+<p><img src="/img/stencyl/step1-1.png" alt="Blank Stencyl Project" /></p>
+
+<p>Create a new level called Test Level and give it a light green background color.</p>
+
+<p><img src="/img/stencyl/step1-2.png" alt="Creating a Stencyl Level" /></p>
+
+<p><strong>Tip</strong>: When creating a new game in Stencyl, it is always a good idea to start out with a small playground to test
+your ideas. Only when your ideas have been proven sound should you continue to building real levels.</p>
+
+<h2 id="our-first-enemy">Our First Enemy</h2>
+
+<p>It&rsquo;s time for our first enemy. Download
+<a href="http://yduppen.home.xs4all.nl/blogsupport/blog.publysher.nl/Female%20Blue.png">this image</a>
+ and import it into StencylWorks using the File &gt; Import Resource&hellip; option. Voila: our first evil enemy.</p>
+
+<p><img src="/img/stencyl/step1-3.png" alt="Importing Sprites in Stencyl" /></p>
+
+<p>Go back to the Test Level tab. On the right-hand side of the window, double-click the &ldquo;Layer 0&rdquo; layer and rename it
+to &ldquo;Background&rdquo;. Click on the &ldquo;+&rdquo; button and rename your new layer to &ldquo;Enemies&rdquo;. Switch to the Actors tab,
+click on &ldquo;Female Blue&rdquo; and place a few enemies on the screen.</p>
+
+<p><img src="/img/stencyl/step1-4.png" alt="Adding Sprites to a Level" /></p>
+
+<p><strong>Tip</strong>: When creating new levels, never be afraid to create new layers. When the complexity of your level increases,
+you will be very happy if you have remembered to do this.</p>
+
+<p>Try out your first modifications by pressing the &ldquo;Test Game&rdquo; button. You&rsquo;ll see four evil women standing on a green background.</p>
+
+<h2 id="bringing-our-enemies-to-life">Bringing Our Enemies To Life</h2>
+
+<p>Of course, static enemies are the most boring kind. Let&rsquo;s spice &lsquo;em up.</p>
+
+<p>Go to the &ldquo;Female Blue&rdquo; tab, click on the &ldquo;Behaviors&rdquo; tab and press the &ldquo;Add Behavior&rdquo; button in the bottom left corner.
+Search for the pre-shipped Wander behavior and double click. Time to press &ldquo;Test Game&rdquo; again. You&rsquo;ll now see how the
+evil witches wander around the screen, eventually wandering off screen, never to come back.</p>
+
+<p>Go back to the &ldquo;Female Blue&rdquo; behaviors tab and click &ldquo;Add Behavior&rdquo; again. This time, select the pre-shipped
+&ldquo;Wrap Around Screen&rdquo; behavior. And you guessed it: press &ldquo;Test Game&rdquo; again. This time, our banshees will re-appear on
+the other side of the screen when they wander off.</p>
+
+<p><strong>Tip</strong>: The &ldquo;Test Game&rdquo; button is your friend. Every change you make might ruin your game. Better to find out as soon
+as possible.</p>
+
+<h2 id="let-s-face-it">Let&rsquo;s Face It</h2>
+
+<p>As you have seen, our evil witches might wander around the screen, but their appearance is still quite boring.
+You might have glanced on the &ldquo;Appearance&rdquo; tab of &ldquo;Female Blue&rdquo; and seen that there are animations for
+different directions. Let&rsquo;s use those!</p>
+
+<p>Go to the &ldquo;Dasboard&rdquo; tab, and select the &ldquo;Actor Behaviors&rdquo; entry. Here you will find the two pre-shipped behaviors we
+imported earlier. Click on the &ldquo;Create New&rdquo; button and create a new Design Mode Actor behavior
+called &ldquo;Four way movement animations&rdquo;.</p>
+
+<p><img src="/img/stencyl/step1-6.png" alt="Creating a Four-Way Movement Animation" /></p>
+
+<p>Before we start implementing this behavior, let&rsquo;s think.</p>
+
+<p><strong>Tip</strong>: Programming behaviors is 90% thinking and only 10% creating. The more you think, the easier creating will be.</p>
+
+<p>Our goal is to determine at every moment in the game which direction our enemy is going. For example, if she&rsquo;s going to the left, we want to show an animation of a sprite moving to the left. We want to support four directions: up, down, left and right. But what if she&rsquo;s not moving? Let&rsquo;s call this &ldquo;idle&rdquo;.</p>
+
+<p>Determining the direction of our enemy is done by looking at the speed of the actor. If the speed is 0, the actor is standing still. If the speed in the horizontal direction (the x-direction) is negative, our actor is moving to the left. If the speed in the vertical direction (the y-direction) is negative, our actor is moving to the top of the screen.</p>
+
+<p>If both the x- and the y- direction are negative, our actor is moving to the top-left corner of the screen. In that case, we will use the greater speed to dermine if we want to use the &ldquo;up&rdquo; or the &ldquo;left&rdquo; animation.</p>
+
+<h2 id="creating-our-behavior">Creating Our Behavior</h2>
+
+<p>From our thinking, we have determined that our behavior needs to know about five different animations. Let&rsquo;s start by creating Attributes for this. On the right-hand side of the screen, press &ldquo;Add Attribute&rdquo;. Call it &ldquo;Idle&rdquo; and select the &ldquo;Animation&rdquo; type. Press OK and repeat this with attributes called &ldquo;Up&rdquo;, &ldquo;Down&rdquo;, &ldquo;Left&rdquo; and &ldquo;Right&rdquo;.</p>
+
+<p><strong>Tip</strong>: To prevent the tutorial from getting too verbose, I have omitted the description. In your own games,
+you should always provide a description. Right now you might find it self-evident,
+but when you&rsquo;re still working on your game after two months, you start forgetting stuff.</p>
+
+<p>Now, click the &ldquo;Add Event&rdquo; button on the left and choose the &ldquo;Basics&rdquo;, &ldquo;When Updating&rdquo; event. All the code in this block will be executed at every frame. Try to recreate the following structure:</p>
+
+<p><img src="/img/stencyl/step1-5.png" alt="Creating a Four-Way Movement Animation" /></p>
+
+<p>This tutorial is not about programming, but the structure follows our thinking outlined above.</p>
+
+<h2 id="attaching-our-behavior">Attaching Our Behavior</h2>
+
+<p>Switch back to the &ldquo;Female Blue&rdquo; tab and choose Behaviors. Once again, choose &ldquo;Add Behavior&rdquo; and add the &ldquo;Four way
+movement animations&rdquo; behavior. On the right side of the screen, we can see the attributes we created earlier. Fill them.</p>
+
+<p><img src="/img/stencyl/step1-8.png" alt="Adding a Behavior" /></p>
+
+<p>Press &ldquo;Test Game&rdquo; again and watch in wonder as our enemies have come to life.</p>
+
+<h2 id="wrapping-up">Wrapping Up</h2>
+
+<p>In this tutorial, I have:</p>
+
+<ul>
+<li>created a simple scene to test my ideas;</li>
+<li>created a simple enemy actor;</li>
+<li>added those enemies to my scene;</li>
+<li>used pre-shipped behaviors to let my enemies wander around the screen;</li>
+<li>created a custom behavior to animate my enemy actors;</li>
+</ul>
+
+<p><a href="http://www.stencyl.com/game/play/12338">The final result can be played here</a> and the game can be downloaded from
+StencylForge under the name &ldquo;Publysher - TD Tutorial #1&rdquo;.</p>
+
+<p>In <a href="http://blog.publysher.nl/2012/04/stencyl-tower-defense-2-adding-towers.html">part 2 of this tutorial</a>
+I will add a Tower to shoot those evil minions.</p>
+
+	</li>
+</ol>
+
+
+</body>
+</html>

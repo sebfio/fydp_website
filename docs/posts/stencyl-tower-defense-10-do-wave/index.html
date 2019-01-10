@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ShopTrac&#39;s Blog</title>
+	<meta name="viewport" content="width=device-width" />
+	<link rel="stylesheet" type="text/css" href="http://sebfio.github.io/fydp_websitecss/style.css" />
+</head>
+<body>
+
+<h1>
+	<a href="http://sebfio.github.io/fydp_website">ShopTrac&#39;s Blog</a>
+	<label class="last_update">Updated on 2013-08-31 00:00:00</label>
+</h1>
+
+
+<ol class="timeline">
+	<li class="tl-node">
+		<div class="tl-stamp">2012-08-04 00:00:00</div>
+		<div class="tl-content">Stencyl Tower Defense Tutorial: Do the Wave</div>
+			
+
+<p>Last week I talked explained how to lose. This week, I&rsquo;ll talk about winning. After a short introduction on what it
+means to win a Tower Defense level, the tutorial will explain how to have multiple waves and how to recognize that
+the player has won.</p>
+
+<p><a href="http://www.stencyl.com/game/play/13985">The result of this part can be seen here</a>; you can also find it on
+StencylForge under the name &ldquo;Publysher – TD Tutorial part #10&rdquo;.</p>
+
+<h2 id="winning-what-does-it-mean">Winning: What does it mean?</h2>
+
+<p>In a typical tower defense game you win the level when you have survived all waves; in other words: when all waves
+have passed and you have at least one life left.</p>
+
+<p>This of course begs the question: what does it mean for a wave to have passed? In our current game,
+a wave has passed when every enemy that has been spawned by this wave has left the screen – either by being killed or
+by passing the finish line.</p>
+
+<p>So in order to implement winning in our Tower Defense game, we need to do the following:</p>
+
+<ul>
+<li>Detect when a wave has passed</li>
+<li>Detect when all the waves have passed and start the &ldquo;player won level&rdquo; feedback.</li>
+</ul>
+
+<p>For now, the feedback will consist of a happy &ldquo;You Won&rdquo; message, after which the level will start again.</p>
+
+<h2 id="multiple-waves">Multiple Waves</h2>
+
+<p>A closely related aspect is the concept of multiple waves. Right now, our Tower Defense game supports only one single wave – however, once a wave has been exhausted a new wave ought to arrive. This new wave should start after a predetermined time, and the player should have the possibility to call it early.</p>
+
+<p>In order to have a game with multiple waves, we need the following:</p>
+
+<ul>
+<li>Detect when a wave has passed</li>
+<li>Start a new wave after the previous wave has passed</li>
+<li>Show how many waves there are left</li>
+<li>Show a button to call the next wave early</li>
+</ul>
+
+<p>Notice how the first requirement is identical to the first requirement of winning the game!</p>
+
+<h2 id="structure">Structure</h2>
+
+<p>Let&rsquo;s start with showing the number of waves. Each Tower defense game has its own method of doing this,
+but for this game we&rsquo;ll keep it simple: just an icon with two numbers: the current wave and the total number of waves.
+If this sounds familiar, it should be – it is going to be very similar to the Number of Lives Manager and the Score
+Manager. When a wave is exhausted, a button will show up somewhere on the screen. Clicking this button will cause the
+next wave to appear; if a certain amount of time has elapsed and the player hasn&rsquo;t clicked the button,
+the next wave will appear anyway.</p>
+
+<p>In order to implement this, I will create a few actors, two new behaviors and I will extend a number of existing
+behaviors. The diagram below gives an overview of the various new and modified components:</p>
+
+<p><img src="/img/stencyl/step10-1.png" alt="" /></p>
+
+<h2 id="intermezzo-uml">Intermezzo: UML</h2>
+
+<p>Quite a complicated diagram, isn&rsquo;t it? By the way, this kind of drawing is called an UML diagram,
+and it is a great way to visualize the different components in your game and to track the interactions between them.</p>
+
+<p>To read a diagram like this, start at the top where I have drawn the our Test Level. For this part of the tutorial,
+there are two relevant behaviors attached called &ldquo;Player Wins&rdquo; and &ldquo;Number of Waves Manager&rdquo;. The latter behavior
+communicates with three different actors, called &ldquo;Spawning Pool&rdquo; (remember that one?),
+&ldquo;Number of Waves&rdquo; and &ldquo;Next Wave Button&rdquo;, and it uses a new Font for the drawing called &ldquo;Waves Font&rdquo;.</p>
+
+<p>The &ldquo;Spawning Pool&rdquo; actor still has to the &ldquo;Spawn Enemies&rdquo; behavior I&rsquo;ve introduced in an earlier post. The &ldquo;Next
+Wave Button&rdquo; actor has a &ldquo;Button Feedback&rdquo; behavior. The &ldquo;Number of Waves&rdquo; actor has no behaviors at all.</p>
+
+<p>As you can see, this diagram does not visualize the entire tower defense game. Part of the trick in creating such
+diagrams is omitting everything you don&rsquo;t need.</p>
+
+<p><strong>Tip</strong>: making diagrams such as these really helps in getting a grip on your own game.</p>
+
+<h2 id="preparations">Preparations</h2>
+
+<p>The previous picture makes it easy to start setting up a number of new actors:</p>
+
+<ul>
+<li>Number of Waves actor: this is just a simple actor with a nice skull icon from part 8.</li>
+<li>You Win Message actor: this one is similar to the You Lost message I created earlier,
+and it contains the existing &ldquo;Message&rdquo; behavior</li>
+<li>Waves Font: a copy of the Score Font, but using slightly different colors to match the colors of our skull</li>
+<li>Next Wave Button actor: a simple actor containing a button which I created on this website.</li>
+<li>Button Feedback behavior: a simple design mode actor behavior to show some feedback when hovering over the button.</li>
+</ul>
+
+<p><img src="/img/stencyl/step10-2.png" alt="" /></p>
+
+<p>And of course, because I will need them later on:</p>
+
+<ul>
+<li>a design mode scene behavior called &ldquo;Number of Waves Manager&rdquo;</li>
+<li>a design mode scene behavior called &ldquo;Player Wins&rdquo;</li>
+</ul>
+
+<p>You can attach these behaviors to the test scene; their contents will be explained in the remainder of this tutorial.</p>
+
+<p>If you haven&rsquo;t done so already, now is a good time to add some extra waves to your Enemy Spawners – this will make
+testing so much easier later on.</p>
+
+<h2 id="counting-waves">Counting Waves</h2>
+
+<p>It&rsquo;s time to do some thinking again. As I pointed out above, we will need some information to decide if we have won.
+Let&rsquo;s start with some definitions:</p>
+
+<ul>
+<li>Active Spawner – an enemy spawner that is currently busy spawning enemies</li>
+<li>Active Enemy – an enemy that has been spawned, has not yet been killed by a tower and has not yet passed the finish
+line.</li>
+</ul>
+
+<p>Based on these definitions, we can now determine if a wave has passed:</p>
+
+<p><em>A wave has passed if there are no more active spawners and if there are no more active enemies.</em></p>
+
+<p>This does mean that we will need to know if a spawner is active or not. Let&rsquo;s make sure this happens.</p>
+
+<h2 id="modifying-the-enemy-spawner">Modifying the Enemy Spawner</h2>
+
+<p>The first thing I&rsquo;m going to do is to change the enemy spawner. Remember how we added a &ldquo;start next wave&rdquo; call in the
+ &ldquo;on created&rdquo; event? Let&rsquo;s remove that.</p>
+
+<p>The next step is a small modification to the &ldquo;start wave&rdquo; event. When a new wave starts,
+this behavior will trigger a new event called &ldquo;spawner_started&rdquo;. Following this train of thought,
+let&rsquo;s also modify the &ldquo;execute wave&rdquo; event: when all enemies for the current wave have been spawned,
+let&rsquo;s trigger an event called &ldquo;spawner_finished&rdquo;.</p>
+
+<p>And finally, thinking ahead a bit, let&rsquo;s make new custom block called &lsquo;number of waves&rsquo;:</p>
+
+<p><img src="/img/stencyl/step10-3.png" alt="" /></p>
+
+<p>The end-result should look like this:</p>
+
+<p><img src="/img/stencyl/step10-4.png" alt="" /></p>
+
+<h2 id="number-of-waves-manager">Number of Waves Manager</h2>
+
+<p>And now everything is in place for our coup-de-grace: the Number of Waves Manager. This behavior has a number of responsibilities:</p>
+
+<ul>
+<li>Know how many waves there will be</li>
+<li>Know which wave we&rsquo;re currently spawning</li>
+<li>Draw these numbers on the screen</li>
+<li>Keep track of the number of active spawners, so we can determine if there are any active spawners left</li>
+<li>Keep track of the number of active enemies, so we can determine if there are any enemies left</li>
+<li>Draw the &ldquo;Next Wave&rdquo; button when required</li>
+<li>Start a new wave when the &ldquo;Next Wave&rdquo; button has been clicked</li>
+<li>Trigger a &ldquo;no more enemies&rdquo; event when all the waves have been exhausted</li>
+</ul>
+
+<p>How are we going to do this?</p>
+
+<p>We know how many waves there will be in total by asking all the enemy spawners how many waves they have. The largest
+of those numbers is the total number of waves. We will remember this in a hidden Number attribute called &ldquo;Max Waves&rdquo;.</p>
+
+<p>We can keep track of the current wave by using a hidden Number attribute called &ldquo;Number of Waves&rdquo;. This number will
+initially be 0, and it will be increased whenever a new wave starts.</p>
+
+<p>These attributes can then be used in a &ldquo;when drawing&rdquo; event to draw the numbers on the screen.</p>
+
+<p>We can also keep track of the number of active spawners by listening to the &ldquo;spawner started&rdquo; event introduced in the
+previous section. The behavior will get a new hidden Number attribute called &ldquo;Active Spawners&rdquo;. This number will be
+increased whenever a &ldquo;spawner started&rdquo; event is triggered, and it will be decreased whenever a &ldquo;spawner finished&rdquo;
+event is triggered.</p>
+
+<p>For the number of active enemies a new hidden Number attribute is created called &ldquo;Active Enemies&rdquo;. This number is
+increased whenever an enemy is created, and it will be decreased whenever an enemy dies. Remember,
+enemies also die when they cross the finish line.</p>
+
+<p>If a spawner has finished, and the resulting number of active spawners is zero, it is time to show the &ldquo;Next Wave&rdquo;
+button. This button is stored in a hidden Actor attribute called &ldquo;Go Button&rdquo;. The button is created and hidden in a
+&ldquo;When Creating&rdquo; event, and it is shown here.</p>
+
+<p>Using a Mouse Click event, we can determine if the user clicked on the &ldquo;Next Wave&rdquo; button. If this happens,
+we call the &ldquo;Start next wave&rdquo; event on our enemy spawners, and hide the button again.</p>
+
+<p>Finally, if an enemy dies, the number of active enemies is zero and the number of active spawners is zero,
+we know that the current wave has finished. Now there are two choices: either there are waves left,
+in which case we start a new wave, or there are no more waves left, in which case the player has won this level. Time
+ to trigger a &ldquo;no more enemies&rdquo; event.</p>
+
+<p>Combining all of this, we get the following behavior:</p>
+
+<p><img src="/img/stencyl/step10-5.png" alt="" /></p>
+
+<h2 id="you-won">You Won</h2>
+
+<p>The &ldquo;no more enemies&rdquo; event is captured by the &ldquo;Player Wins&rdquo; behavior. This behavior just makes sure that all the
+towers are disabled; it then shows the You Won message and, for now, reloads the game.</p>
+
+<p><img src="/img/stencyl/step10-6.png" alt="" /></p>
+
+<p>If you&rsquo;re feeling adventurous, you can create new levels for your game and make sure the next level is loaded when the player has won.</p>
+
+<h2 id="wrapping-up">Wrapping Up</h2>
+
+<p>In this part of the tutorial, I have:</p>
+
+<ul>
+<li>Introduced the concept winning</li>
+<li>Introduced the concept of UML diagrams</li>
+<li>Determined how all the different actors and behaviors can work together to give the player the right experience</li>
+<li>Created a lot of new actors and behaviors</li>
+</ul>
+
+<p><a href="http://www.stencyl.com/game/play/13985">The final result can be seen here</a>, and the game can be downloaded from
+StencylForge under the name &ldquo;Publysher – TD Tutorial #10&rdquo;.</p>
+
+<h2 id="the-end">The End?</h2>
+
+<p>This is the end of my tutorial. My blog is filled with interesting other technologies,
+but I will no longer be writing about Stencyl game development. Of course, this does not mean that it is the end
+for your game!</p>
+
+<p>By following this tutorial you have created a solid basis to experiment further on. Whenever you get stuck, don&rsquo;t
+hesitate to ask around in the <a href="http://community.stencyl.com/">Stencyl Forums</a> – they are filled with friendly people
+who are more than willing to help you.</p>
+
+<p>If you have created an interesting tower defense game based on this tutorial, let me know and I will give it special
+attention in this blog.</p>
+
+<p>Happy Stencyling!</p>
+
+	</li>
+</ol>
+
+
+</body>
+</html>

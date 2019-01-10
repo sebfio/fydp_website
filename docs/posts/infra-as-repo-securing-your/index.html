@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ShopTrac&#39;s Blog</title>
+	<meta name="viewport" content="width=device-width" />
+	<link rel="stylesheet" type="text/css" href="http://sebfio.github.io/fydp_websitecss/style.css" />
+</head>
+<body>
+
+<h1>
+	<a href="http://sebfio.github.io/fydp_website">ShopTrac&#39;s Blog</a>
+	<label class="last_update">Updated on 2013-08-31 00:00:00</label>
+</h1>
+
+
+<ol class="timeline">
+	<li class="tl-node">
+		<div class="tl-stamp">2013-08-31 00:00:00</div>
+		<div class="tl-content">Infra as a Repo: Securing your infrastructure with Salt</div>
+			
+
+<p>Provisioning servers on <a href="https://www.digitalocean.com/?refcode=8d8ff680bec5">DigitalOcean</a> like a king is one thing, but let&rsquo;s be honest: <a href="http://dandydev.net/blog/crashing-servers-and-riding-waves#.UiH0PGTOmwY">default installations don&rsquo;t provide
+a lot of security</a>. So I&rsquo;ve spent some time to manage the security on my provisioned boxes. This post (and
+probably the next as well) will show you how I used <a href="http://saltstack.com/">SaltStack</a> to secure my infrastructure.</p>
+
+<h2 id="the-goal">The goal</h2>
+
+<blockquote>
+<p>Given the master/minion set-up from the previous posts, I want to have a running firewall which:</p>
+
+<ul>
+<li>enables SSH access</li>
+<li>enables minion/master communication</li>
+<li>enables HTTP(S) access</li>
+</ul>
+</blockquote>
+
+<h2 id="quick-fix">Quick Fix</h2>
+
+<p>The first step was an easy one. In <a href="http://blog.publysher.nl/2013/08/infra-as-repo-separating-master-from.html">my previous post</a> I introduced a Makefile to create a public-key
+infrastructure; subsequently, the keys were securely distributed using the <a href="https://github.com/saltstack/salty-vagrant">salty-vagrant</a> plugin.</p>
+
+<p>Unfortunately, I forgot that the directory in which your <code>Vagrantfile</code> resides is automatically shared over all machines.
+Which means that in practice, I started out with carefully distributing my secret private keys, only to upload them to
+all my hosts in the next step.</p>
+
+<p>Luckily, this was easily fixed by the following line in my <code>Vagrantfile</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span>pre<span style="color:#f92672">&gt;&lt;</span>code<span style="color:#f92672">&gt;</span>  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>synced_folder <span style="color:#e6db74">&#39;shared/&#39;</span>, <span style="color:#e6db74">&#39;/vagrant/&#39;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#e6db74">/code&gt;&lt;/</span>pre<span style="color:#f92672">&gt;</span></code></pre></div>
+
+<p>Phew.</p>
+
+<h2 id="adding-a-firewall">Adding a Firewall</h2>
+
+<p>The next step was a bit more complicated: adding firewall rules. Although Salt provides an <a href="http://docs.saltstack.com/ref/states/all/salt.states.iptables.html#module-salt.states.iptables">iptables module</a>,
+I decided to go for <a href="https://help.ubuntu.com/community/UFW">ufw</a>. Partially because I like to be contrarian, but mostly because the UFW guys know more
+about firewalls than me.</p>
+
+<p>So, what to do when Salt does not provide a module for your needs? My first attempt looked something like this.</p>
+
+<p><code>salt/roots/salt/firewall/base.sls</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">&lt;pre&gt;&lt;code&gt;ufw:
+  pkg:
+    - installed
+  service:
+    - running
+    - require:
+       - cmd.run: ufw-enable
+
+<span style="color:#75715e"># Enable</span>
+ufw-enable:
+  cmd.run:
+    - name: ufw enable
+    - require:
+      - pkg: ufw
+
+<span style="color:#75715e"># SSH</span>
+ufw-ssh:
+  cmd.run:
+    - name: ufw allow SSH
+    - require:
+      - pkg: ufw
+    - watch_in:
+      - service: ufw
+&lt;/code&gt;&lt;/pre&gt;</code></pre></div>
+
+<p><code>salt/roots/salt/firewall/salt-master.sls</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">&lt;pre&gt;&lt;code&gt;ufw-salt-master:
+  cmd.run:
+    - name: ufw allow from $(getent ahosts nginx01.intranet <span style="color:#e6db74">| awk &#39;NR==1 {print $1}&#39;) to any port 4505,4506 proto tcp
+</span><span style="color:#e6db74">    - require:
+</span><span style="color:#e6db74">      - pkg: ufw
+</span><span style="color:#e6db74">    - watch_in:
+</span><span style="color:#e6db74">      - service: ufw</span>
+&lt;/code&gt;&lt;/pre&gt;</code></pre></div>
+
+<p><code>salt/roots/top.sls</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">&lt;pre&gt;&lt;code&gt;<span style="color:#e6db74">&#39;*&#39;</span>:
+  - firewall.base
+<span style="color:#e6db74">&#39;salt.intranet&#39;</span>:
+  - firewall.salt-master
+&lt;/code&gt;&lt;/pre&gt;</code></pre></div>
+
+<p>And, to be honest, this is not a bad first attempt. I define a base firewall which allows SSH access and enables UFW;
+I then proceeded to define a specific rule for the salt master which allows TCP connections to the salt master 0MQ ports
+4505 and 4506, and I applied these rules to the correct hosts in <code>top.sls</code>.</p>
+
+<p>Still, this set-up has two major problems. First of all, because the commands are <a href="http://docs.saltstack.com/ref/states/all/salt.states.cmd.html">stateless</a>, they are run
+every time the highstate is ensured. Not a huge problem in itself, but not the most beautiful solution either.</p>
+
+<p>Secondly, in order to only allow 0MQ access from my own hosts, I had to resort to a dirty trick; since the IP address
+of the various hosts changes per provider, I really need to allow access based on hostname, something that is not
+supported by UFW out of the box. Hence the somewhat dubious <code>$(getent ahosts nginx01.intranet)</code> fragment in my
+<code>salt-master.sls</code>.</p>
+
+<h2 id="creating-salt-modules">Creating Salt modules</h2>
+
+<p>Whenever you have a need that is not covered by the basic Salt modules, the Salt documentation suggests you create
+your own modules. And wow, that&rsquo;s easy. (Footnote: my first attempt at provisioning was based on <a href="https://puppetlabs.com/">Puppet</a>; customizing
+Puppet requires you to do some weird magic in some kind of almost-language called Ruby. It&rsquo;s no fun.)</p>
+
+<p>Salt distinguishes two kind of modules: <a href="http://docs.saltstack.com/ref/#minion-execution-modules">execution modules</a> (do stuff) and <a href="http://docs.saltstack.com/ref/states/writing.html">state modules</a> (ensure that stuff is
+configured as desired). Let&rsquo;s have a look at my UFW execution module:</p>
+
+<p><code>salt/roots/salt/_modules/ufw.py</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&lt;</span>pre<span style="color:#f92672">&gt;&lt;</span>code<span style="color:#f92672">&gt;&amp;</span>quot;<span style="color:#f92672">&amp;</span>quot;<span style="color:#f92672">&amp;</span>quot;
+Execution module <span style="color:#66d9ef">for</span> UFW<span style="color:#f92672">.</span>
+<span style="color:#f92672">&amp;</span>quot;<span style="color:#f92672">&amp;</span>quot;<span style="color:#f92672">&amp;</span>quot;
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">is_enabled</span>():
+    cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;ufw status | grep &amp;quot;Status: active&amp;quot;&#39;</span>
+    out <span style="color:#f92672">=</span> __salt__[<span style="color:#e6db74">&#39;cmd.run&#39;</span>](cmd)
+    <span style="color:#66d9ef">return</span> True <span style="color:#66d9ef">if</span> out <span style="color:#66d9ef">else</span> False
+
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">set_enabled</span>(enabled):
+    cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;ufw --force enable&#39;</span> <span style="color:#66d9ef">if</span> enabled <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;ufw disable&#39;</span>
+    __salt__[<span style="color:#e6db74">&#39;cmd.run&#39;</span>](cmd)
+
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add_rule</span>(rule):
+    cmd <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>quot;ufw <span style="color:#f92672">&amp;</span>quot; <span style="color:#f92672">+</span> rule
+    out <span style="color:#f92672">=</span> __salt__[<span style="color:#e6db74">&#39;cmd.run&#39;</span>](cmd)
+    __salt__[<span style="color:#e6db74">&#39;cmd.run&#39;</span>](<span style="color:#f92672">&amp;</span>quot;ufw reload<span style="color:#f92672">&amp;</span>quot;)
+    <span style="color:#66d9ef">return</span> out
+<span style="color:#f92672">&lt;/</span>code<span style="color:#f92672">&gt;&lt;/</span>pre<span style="color:#f92672">&gt;</span></code></pre></div>
+
+<p>Complicated, no? By putting my execution module in the <code>_modules/</code> directory, this new execution module is automatically
+synced to all minions. (If not, use <code>salt '*' saltutil.sync_all</code> to force a new sync). This module is now available
+like any salt module: <code>salt '*' ufw.is_enabled</code> gives you a nice overview of all minions that have UFW enabled.</p>
+
+<p>Note how I used the <code>__salt__</code> dict to defer the actual work to the existing <code>cmd.run</code> function. Quite a nice feature.</p>
+
+<p>The state module turned out to be a bit more complicated, but mostly because it has to do a lot of bookkeeping:</p>
+
+<p><code>salt/roots/salt/_states/ufw.py</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&lt;</span>pre<span style="color:#f92672">&gt;&lt;</span>code<span style="color:#f92672">&gt;</span><span style="color:#75715e"># boilerplate &amp;amp; helpers...</span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">enabled</span>(name, <span style="color:#f92672">**</span>kwargs):
+    <span style="color:#66d9ef">if</span> __salt__[<span style="color:#e6db74">&#39;ufw.is_enabled&#39;</span>]():
+        <span style="color:#66d9ef">return</span> _unchanged(name, <span style="color:#f92672">&amp;</span>quot;UFW <span style="color:#f92672">is</span> already enabled<span style="color:#f92672">&amp;</span>quot;)
+
+    <span style="color:#66d9ef">if</span> __opts__[<span style="color:#e6db74">&#39;test&#39;</span>]:
+        <span style="color:#66d9ef">return</span> _test(name, <span style="color:#f92672">&amp;</span>quot;UFW will be enabled<span style="color:#f92672">&amp;</span>quot;)
+
+    <span style="color:#66d9ef">try</span>:
+        __salt__[<span style="color:#e6db74">&#39;ufw.set_enabled&#39;</span>](True)
+    <span style="color:#66d9ef">except</span> (CommandExecutionError, CommandNotFoundError) <span style="color:#66d9ef">as</span> e:
+        <span style="color:#66d9ef">return</span> _error(name, e<span style="color:#f92672">.</span>message)
+
+    <span style="color:#66d9ef">return</span> _changed(name, <span style="color:#f92672">&amp;</span>quot;UFW <span style="color:#f92672">is</span> enabled<span style="color:#f92672">&amp;</span>quot;, enabled<span style="color:#f92672">=</span>True)
+
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">allowed</span>(name, app<span style="color:#f92672">=</span>None, protocol<span style="color:#f92672">=</span>None,
+            from_addr<span style="color:#f92672">=</span>None, from_port<span style="color:#f92672">=</span>None, to_addr<span style="color:#f92672">=</span>None, to_port<span style="color:#f92672">=</span>None):
+
+    rule <span style="color:#f92672">=</span> _as_rule(<span style="color:#f92672">&amp;</span>quot;allow<span style="color:#f92672">&amp;</span>quot;, app<span style="color:#f92672">=</span>app, protocol<span style="color:#f92672">=</span>protocol,
+                   from_addr<span style="color:#f92672">=</span>from_addr, from_port<span style="color:#f92672">=</span>from_port,
+                   to_addr<span style="color:#f92672">=</span>to_addr, to_port<span style="color:#f92672">=</span>to_port)
+
+    <span style="color:#66d9ef">if</span> __opts__[<span style="color:#e6db74">&#39;test&#39;</span>]:
+        <span style="color:#66d9ef">return</span> _test(name, <span style="color:#f92672">&amp;</span>quot;{<span style="color:#ae81ff">0</span>}: {<span style="color:#ae81ff">1</span>}<span style="color:#f92672">&amp;</span>quot;<span style="color:#f92672">.</span>format(name, rule))
+
+    <span style="color:#66d9ef">try</span>:
+        out <span style="color:#f92672">=</span> __salt__[<span style="color:#e6db74">&#39;ufw.add_rule&#39;</span>](rule)
+    <span style="color:#66d9ef">except</span> (CommandExecutionError, CommandNotFoundError) <span style="color:#66d9ef">as</span> e:
+        <span style="color:#66d9ef">return</span> _error(name, e<span style="color:#f92672">.</span>message)
+
+    changes <span style="color:#f92672">=</span> False
+    <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> out<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>):
+        <span style="color:#66d9ef">if</span> line<span style="color:#f92672">.</span>startswith(<span style="color:#f92672">&amp;</span>quot;Skipping<span style="color:#f92672">&amp;</span>quot;):
+            <span style="color:#66d9ef">continue</span>
+        <span style="color:#66d9ef">if</span> line<span style="color:#f92672">.</span>startswith(<span style="color:#f92672">&amp;</span>quot;Rule added<span style="color:#f92672">&amp;</span>quot;) <span style="color:#f92672">or</span> line<span style="color:#f92672">.</span>startswith(<span style="color:#f92672">&amp;</span>quot;Rules updated<span style="color:#f92672">&amp;</span>quot;):
+            changes <span style="color:#f92672">=</span> True
+            <span style="color:#66d9ef">break</span>
+        <span style="color:#66d9ef">return</span> _error(name, line)
+
+    <span style="color:#66d9ef">if</span> changes:
+        <span style="color:#66d9ef">return</span> _changed(name, <span style="color:#f92672">&amp;</span>quot;{<span style="color:#ae81ff">0</span>} allowed<span style="color:#f92672">&amp;</span>quot;<span style="color:#f92672">.</span>format(name), rule<span style="color:#f92672">=</span>rule)
+    <span style="color:#66d9ef">else</span>:
+        <span style="color:#66d9ef">return</span> _unchanged(name, <span style="color:#f92672">&amp;</span>quot;{<span style="color:#ae81ff">0</span>} was already allowed<span style="color:#f92672">&amp;</span>quot;<span style="color:#f92672">.</span>format(name))
+<span style="color:#f92672">&lt;/</span>code<span style="color:#f92672">&gt;&lt;/</span>pre<span style="color:#f92672">&gt;</span></code></pre></div>
+
+<p>If you&rsquo;re interested in the helpers and boilerplate, <a href="https://github.com/publysher/infra-example-nginx/blob/72837a9cb5cb01e5dab9d3ccfcbf5995a4dcf934/salt/roots/salt/_states/ufw.py">look here</a>.</p>
+
+<h2 id="the-final-rules">The final rules</h2>
+
+<p>Using these brand new modules, the new SLS files looked lot more like proper state files.</p>
+
+<p><code>salt/roots/salt/firewall/base.sls</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">&lt;pre&gt;&lt;code&gt;ufw:
+  pkg:
+    - installed
+  ufw.enabled:
+    - require:
+      - pkg: ufw
+
+
+ufw-ssh:
+  ufw.allowed:
+    - protocol: tcp
+    - to_port: ssh
+    - require:
+      - pkg: ufw
+&lt;/code&gt;&lt;/pre&gt;</code></pre></div>
+
+<p>Reprovisioning the VM now behaves as expected – enabling the firewall and adding SSH is executed only once. Furthermore,
+the Salt master config has become much more readable:</p>
+
+<p><code>salt/roots/salt/firewall/salt-master.sls</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">&lt;pre&gt;&lt;code&gt;include:
+  - firewall.base
+
+{% for minion in pillar[<span style="color:#e6db74">&#39;minions&#39;</span>] %}
+
+ufw-salt-master-{{ minion }}:
+  ufw.allowed:
+    - from_addr: {{ minion }}
+    - protocol: tcp
+    - to_port: <span style="color:#75715e">&amp;quot;4505,4506&amp;quot;</span>
+    - require:
+      - pkg: ufw
+
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;</code></pre></div>
+
+<p>Note how I&rsquo;ve sneakily enabled pillar data as well. Deducing the configuration for <code>firewall/http.sls</code> is left as
+an exercise to the reader (<a href="https://github.com/publysher/infra-example-nginx/blob/develop/salt/roots/salt/firewall/http.sls">hint</a>).</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Managing your firewall with Salt is not that hard; it requires some module magic, but that is very easy to do. Of course,
+having a firewall is not enough; stay tuned for the next post where I will add more security measures.</p>
+
+<p><em>Don&rsquo;t forget: <a href="https://github.com/publysher/infra-example-nginx">my infra is a repo</a>, so go ahead and fork it</em></p>
+
+	</li>
+</ol>
+
+
+</body>
+</html>

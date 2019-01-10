@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ShopTrac&#39;s Blog</title>
+	<meta name="viewport" content="width=device-width" />
+	<link rel="stylesheet" type="text/css" href="http://sebfio.github.io/fydp_websitecss/style.css" />
+</head>
+<body>
+
+<h1>
+	<a href="http://sebfio.github.io/fydp_website">ShopTrac&#39;s Blog</a>
+	<label class="last_update">Updated on 2013-08-31 00:00:00</label>
+</h1>
+
+
+<ol class="timeline">
+	<li class="tl-node">
+		<div class="tl-stamp">2012-05-28 00:00:00</div>
+		<div class="tl-content">Stencyl Tower Defense Tutorial: Satisfaction and Scoring</div>
+			
+
+<p>In the previous post I allowed the player to place his own towers to shoot the enemies. This was a great step
+forward, but one thing was lacking: the satisfaction after the kill. Daniel Cook from LostGarden has <a href="http://www.lostgarden.com/2006/10/what-are-game-mechanics.html">a great article
+on feedback loops</a>, and I want some of that.</p>
+
+<p>So, in this post I will add some visual feedback on killing enemies, and introduce the concept of Scores.</p>
+
+<p><a href="http://www.stencyl.com/game/play/12848">The result can be found here</a>; you can also find it on StencylForge under
+the name &ldquo;Publysher – TD Tutorial #8&rdquo;.</p>
+
+<h2 id="going-for-the-kill">Going For The Kill</h2>
+
+<p>Until now, killed enemies just disappeared – not much feedback there. If you look at other games,
+you will see that killed enemies usually leave an explosion or smoking ruins. So I&rsquo;ve decided to show a small fading
+skull whenever an enemy dies.</p>
+
+<p>The first step was to find a nice skull. After some searching,
+<a href="http://opengameart.org/content/various-icons">I found the skull icon I wanted on OpenGameArt.org</a>. It
+had the right look, the right dimensions, and its license allows me to use it.</p>
+
+<p><strong>Tip</strong>: <a href="http://opengameart.org/">opengameart.org</a> is a great place to find free art if you can&rsquo;t find it on
+StencylForge.</p>
+
+<p>So, how to use this skull? The pre-shipped Health Manager behavior I&rsquo;m using on my enemies has the option to spawn
+another actor on death, for precisely this kind of interactions. So I went off and created a new Actor called &ldquo;Dead
+Enemy&rdquo; and placed it in a new Collision Group called &ldquo;Visual Effects&rdquo;.</p>
+
+<p>I then proceeded by creating a new Design Mode Actor Behavior called &ldquo;Dead Enemy Feedback&rdquo;.  To make a long story
+short: this was the result:</p>
+
+<p><img src="/img/stencyl/step8-1.png" alt="" /></p>
+
+<p>I added the behavior to the Dead Enemy actor and updated my enemies: for each enemy I went to the &ldquo;Health Manager&rdquo;
+behavior, ticked the &ldquo;Spawn Actor On Death&rdquo; box and set the &ldquo;Actor Type To Spawn&rdquo; field to &ldquo;Dead Enemy&rdquo;:</p>
+
+<p><img src="/img/stencyl/step8-2.png" alt="" /></p>
+
+<p>The actual values in my behavior required some tweaking, but I&rsquo;m quite content with the result.</p>
+
+<h2 id="keeping-track">Keeping Track</h2>
+
+<p>Floating skulls might be very satisfying, but most players want more: they want to keep track of their score. I so no
+ reason to disappoint those players, so the next step is to introduce the concept of score.</p>
+
+<p>A score is basically an arbitrary number that is shown somewhere on the screen. The more enemies you kill,
+the higher your score. In order to show this number on the screen, we require a Font. So let&rsquo;s start by creating a
+Score Font.</p>
+
+<p>On your Dashboard tab, go to Fonts and click the big button. The first option you see is the actual TrueType Font you
+want to use. Whenever I need a fond, I go to dafont.com and this time I downloaded the
+<a href="http://www.dafont.com/transformers-movie.font">Transformers Movie font</a>.</p>
+
+<p>Tip: <a href="http://dafont.com">dafont.com</a> is a great place to find new fonts. As always,
+be sure to check the license of the font!</p>
+
+<p>Now that we have a font, we can go back to Stencyl and configure it. Using the &ldquo;Choose Custom&rdquo; button I&rsquo;ve added the
+font I just downloaded, and I set the following values:</p>
+
+<ul>
+<li>Size: 24px</li>
+<li>Color: Yellow</li>
+<li>Gradient Color: Orange</li>
+<li>Gradient Offset: 6px</li>
+</ul>
+
+<p>Under the tab &ldquo;Effects&rdquo; I&rsquo;ve also set the Shadow  Blur Amount to 1px to give the font a nice outline – this makes it
+easier to see on various backgrounds.</p>
+
+<p><strong>Tip</strong>: a Blur Amount often gives better results than a Stroke.</p>
+
+<p>Based on this font, it&rsquo;s time to open our Test Scene and add the pre-shipped Score Manager. I&rsquo;ve used the following
+settings:</p>
+
+<ul>
+<li>Persistent: no</li>
+<li>Score Font: Score Font</li>
+<li>X Offset: 750</li>
+</ul>
+
+<p>Time to test again, and behold: our scene now has a big 0 in the right upper corner.</p>
+
+<p><img src="/img/stencyl/step8-3.png" alt="" /></p>
+
+<h2 id="scoring">Scoring</h2>
+
+<p>The amount of satisfaction you can get from a big 0 is limited, so the next step is to increase this score whenever
+an enemy is killed. As it turns out, this is quite easy.</p>
+
+<p>First, create a new Design Mode Actor Behavior called &ldquo;Add Points When Killed&rdquo; and add a Number attribute called
+&ldquo;Points&rdquo;.</p>
+
+<p>The implementation is straightforward.  Create an Actors &gt; Created or Dies &gt; Specific Actor block and set it to When
+[Self] is [killed]:</p>
+
+<p><img src="/img/stencyl/step8-4.png" alt="" /></p>
+
+<p>As you can see, I&rsquo;ve also added a custom block called &ldquo;Increase score by [Points] when [Self] is killed&rdquo;.  The reason
+for this block will become clear in the next section.</p>
+
+<p>For now, it is enough to add the behavior to all our enemies and configure the Points attribute. Press Play and
+voila! Whenever an enemy is killed, our score increases.</p>
+
+<p>That&rsquo;s what I call satisfaction.</p>
+
+<h2 id="being-lazy">Being Lazy</h2>
+
+<p>You might have noticed that this tutorial involves a lot of &ldquo;update all enemies with a specific behavior and set the
+default values&rdquo;. I know I did, and it annoys me. What&rsquo;s worse, our enemies are 90% identical and the values that make
+them actually different from each other are spread around over multiple behaviors:</p>
+
+<ul>
+<li>The number of hitpoints for our enemies are stored in the Health Manager behavior</li>
+<li>The scoring value is stored in the Add Points When Killed behavior</li>
+<li>The speed is stored in the Follow Path behavior</li>
+</ul>
+
+<p>What&rsquo;s worse: if I decide that damaged enemies should flicker four times instead of three,
+I have to reconfigure the Flicker When Damaged behavior in every enemy. If I want my health bar to be forty pixels
+wide, I have to reconfigure the Health Manager in every enemy.</p>
+
+<p>As a programmer, I do not find this satisfactory.</p>
+
+<p><strong>Tip</strong>: as a programmer, being lazy is a virtue. Whenever you find yourself doing repetitive tasks,
+try to automate it. For more tips like these, read
+<a href="http://www.amazon.com/gp/product/020161622X/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=020161622X&amp;linkCode=as2&amp;tag=dnd05-20">The Pragmatic Programmer: From Journeyman to Master</a>.</p>
+
+<p>So, I created a new Design Mode Actor Behavior called &ldquo;Enemy Configuration&rdquo; with three Number attributes called</p>
+
+<ul>
+<li>Hitpoints Points</li>
+<li>When Killed</li>
+<li>Speed</li>
+</ul>
+
+<p><img src="/img/stencyl/step8-6.png" alt="" /></p>
+
+<p>The first action was to create a &ldquo;When Creating&rdquo; event and add the &ldquo;Make [self] always active&rdquo; block. This makes the
+&ldquo;Always Simulate&rdquo; behavior obsolete, so I added my new Enemy Configuration behavior to every enemy and removed the
+&ldquo;Always Simulate&rdquo; behavior.</p>
+
+<p>The second step was to copy the Hitpoints, Points When Killed and Speed values to the appropriate behaviors.
+Unfortunately, the &ldquo;When Creating&rdquo; event is not the right place to do that – when the &ldquo;When Creating&rdquo; event is
+executed, it is possible that the behaviors you require have not yet been added to your actor!</p>
+
+<p>So, I&rsquo;ve added a second event: the Actors &gt; Created or Dies &gt; Specific Actor event with the following result:</p>
+
+<p><img src="/img/stencyl/step8-5.png" alt="" /></p>
+
+<p>As you can see, I&rsquo;ve also added some extra default settings for the Health Manager and the Follow Path behaviors. And
+remember the mysterious &ldquo;increase score by [Points] when [Self] is killed&rdquo; block from the previous section? This is
+the reason I created it. As you can see, I created a similar initialization block for my &ldquo;Flicker When Damaged&rdquo;
+behavior, called &ldquo;make [Self] flicker [Count] times for [Time] seconds when [Message] happens&rdquo;.</p>
+
+<p><strong>Tip</strong>: if you are using configuration behaviors like this one, always add initialization blocks to your other
+behaviors.</p>
+
+<p><strong>Tip</strong>: when you are using configuration behaviors, avoid the &ldquo;set [Attribute] to [Value] for [Behavior] blocks as
+much as possible. For example, the Health Manager&rsquo;s &ldquo;Set Health for [Self] to [Health]&rdquo; block has a lot more
+functionality than just setting a value.</p>
+
+<h2 id="being-lazy-for-advanced-students">Being Lazy for Advanced Students</h2>
+
+<p>Because my Enemy Configuration behavior is responsible for managing other behaviors,
+I&rsquo;d like to call this a Meta Behavior. Stencyl&rsquo;s support for such meta behaviors is still quite limited; for example,
+it would be nice if I could also add the Health Manager behavior to my enemy dynamically.</p>
+
+<p>If you create your own Meta Behavior, you will run into some unpleasant surprises. For example,
+the Health Manager requires you to first set the _MaximumHealth property before settings the Health property – if
+not, your health bars will have the wrong size. Stuff like this can only be done by trial and error.</p>
+
+<h2 id="wrapping-up">Wrapping Up</h2>
+
+<p>In this tutorial I have:</p>
+
+<ul>
+<li>Added visual feedback on dying enemies</li>
+<li>Introduced the Score Manager and found a nice font for it</li>
+<li>Added a new behavior so killing enemies increases my score</li>
+<li>Introduced the concept of Meta Behaviors to centralize your configuration</li>
+</ul>
+
+<p><a href="http://www.stencyl.com/game/play/12848">The result can be seen here</a>, and the game can be downloaded from
+StencylForge under the name &ldquo;Publysher – TD Tutorial #8&rdquo;.</p>
+
+<p>Stay tuned for the next part where we will track the number of player lives!</p>
+
+	</li>
+</ol>
+
+
+</body>
+</html>
