@@ -1,0 +1,6 @@
+baseURL = "http://sebfio"
+languageCode = "en-us"
+title = "ShopTrac's Blog"
+theme = "hugo-theme-projecthub"
+publishDir = "docs"
+
