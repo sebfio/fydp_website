@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Zoo Wizard on ShopTrac&#39;s Blog</title>
-    <link>http://sebfio.github.io/fydp_website/tags/zoo-wizard/</link>
+    <link>https://sebfio.github.io/fydp_website/tags/zoo-wizard/</link>
     <description>Recent content in Zoo Wizard on ShopTrac&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 19 Aug 2012 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://sebfio.github.io/fydp_website/tags/zoo-wizard/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://sebfio.github.io/fydp_website/tags/zoo-wizard/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Using RDF to populate ZooWizard, a case study</title>
-      <link>http://sebfio.github.io/fydp_website/posts/using-rdf-to-populate-zoowizard-case/</link>
+      <link>https://sebfio.github.io/fydp_website/posts/using-rdf-to-populate-zoowizard-case/</link>
       <pubDate>Sun, 19 Aug 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://sebfio.github.io/fydp_website/posts/using-rdf-to-populate-zoowizard-case/</guid>
+      <guid>https://sebfio.github.io/fydp_website/posts/using-rdf-to-populate-zoowizard-case/</guid>
       <description>For some time, I&amp;rsquo;ve been keeping a small website called ZooWizard. It&amp;rsquo;s main purpose: to have an outlet for two of my main hobbies: visiting zoos and programming.
 One of the problems with keeping this website up to date is the secondary data, i.e. data about zoos and animals. Until now, this data has been sourced using Wikipedia, personal experience and of course: lot&amp;rsquo;s of manual data entry.
 This was nice for a while because it&amp;rsquo;s a great way to get started, but for some time this manual aspect has been getting on my nerves.</description>

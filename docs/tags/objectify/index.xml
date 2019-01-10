@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Objectify on ShopTrac&#39;s Blog</title>
-    <link>http://sebfio.github.io/fydp_website/tags/objectify/</link>
+    <link>https://sebfio.github.io/fydp_website/tags/objectify/</link>
     <description>Recent content in Objectify on ShopTrac&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 19 Feb 2012 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://sebfio.github.io/fydp_website/tags/objectify/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://sebfio.github.io/fydp_website/tags/objectify/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Improving AppEngine performance: from JPA to Objectify</title>
-      <link>http://sebfio.github.io/fydp_website/posts/improving-appengine-performance-from/</link>
+      <link>https://sebfio.github.io/fydp_website/posts/improving-appengine-performance-from/</link>
       <pubDate>Sun, 19 Feb 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://sebfio.github.io/fydp_website/posts/improving-appengine-performance-from/</guid>
+      <guid>https://sebfio.github.io/fydp_website/posts/improving-appengine-performance-from/</guid>
       <description>This weekend, I have migrated my Google AppEngine application Zoo Wizard from JPA to Objectify. This post gives a short overview of my rationale and the steps I&amp;rsquo;ve taken to complete this migration.
 Spoiler: moving to Objectify is a good move, and apart from some differences between @Embeddable in JPA and Objectify, the transition went smoothly.
 Rationale When I first created the application, I opted to use the GAE JPA API to stay in my comfort zone.</description>
