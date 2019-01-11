@@ -1,6 +1,11 @@
 baseURL = "https://sebfio.github.io/fydp_website/"
 languageCode = "en-us"
 title = "ShopTrac's Blog"
-theme = "hugo-theme-projecthub"
+theme = "aether"
 publishDir = "docs"
 
+[params]
+brand = "SoftTrac"
+description = "The biggest revolution to physical retail since Amazon Go"
+homeimg = "tux.svg"
+bgimg = "wasteBanner.jpg"

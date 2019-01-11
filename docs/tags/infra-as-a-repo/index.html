@@ -1,79 +1,117 @@
-<!doctype html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>ShopTrac&#39;s Blog</title>
-	<meta name="viewport" content="width=device-width" />
-	<link rel="stylesheet" type="text/css" href="https://sebfio.github.io/fydp_website/css/style.css" />
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Infra as a Repo &middot; ShopTrac&#39;s Blog</title>
+  <meta name="description" content="" />
+  
+  
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+  <link rel="stylesheet" href="https://sebfio.github.io/fydp_website/css/style.css" />
+  <link rel="stylesheet" href="https://sebfio.github.io/fydp_website/css/xcode.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://sebfio.github.io/fydp_website/css/latolatinfonts.css" />
+  
+  
+  <style>
+    body {
+      background: #ecedef url("https://sebfio.github.io/fydp_website/wasteBanner.jpg") repeat;
+    }
+  </style>
+  
 </head>
-<body>
-
-<h1>
-	<a href="https://sebfio.github.io/fydp_website/">ShopTrac&#39;s Blog</a>
-	<label class="last_update">Updated on 2013-08-31 00:00:00</label>
-</h1>
-
-
-<ol class="timeline">
-	
-		<li class="tl-node">
-			<div class="tl-stamp">2013-08-31 00:00:00</div>
-			<div class="tl-content">
-				<a href="/fydp_website/posts/infra-as-repo-securing-your/">Infra as a Repo: Securing your infrastructure with Salt</a>
-			</div>
-			Provisioning servers on DigitalOcean like a king is one thing, but let&rsquo;s be honest: default installations don&rsquo;t provide a lot of security. So I&rsquo;ve spent some time to manage the security on my provisioned boxes. This post (and probably the next as well) will show you how I used SaltStack to secure my infrastructure.
-The goal  Given the master/minion set-up from the previous posts, I want to have a running firewall which:
-			
-			  <div class="read-more-link">
-			    <a href="/fydp_website/posts/infra-as-repo-securing-your/">...Read More...</a>
-			  </div>
-			
-		</li>
-	
-		<li class="tl-node">
-			<div class="tl-stamp">2013-08-11 00:00:00</div>
-			<div class="tl-content">
-				<a href="/fydp_website/posts/infra-as-repo-separating-master-from/">Infra as a Repo: Separating the Master from the Minion</a>
-			</div>
-			Life can be good. After my previous success in provisioning a master/minion set-up, the next logical step was to introduce a separate master VM. This post explains how I did it. It will be a relatively short post, because it turned out to be ridiculously easy.
-The goal  Given the current single-server master/minion setup, I want to recreate the same situation with two different machines: one Salt master which only functions as a Salt master, and one Salt minion that runs Nginx.
-			
-			  <div class="read-more-link">
-			    <a href="/fydp_website/posts/infra-as-repo-separating-master-from/">...Read More...</a>
-			  </div>
-			
-		</li>
-	
-		<li class="tl-node">
-			<div class="tl-stamp">2013-08-09 00:00:00</div>
-			<div class="tl-content">
-				<a href="/fydp_website/posts/infra-as-repo-adding-salt-master/">Infra as a Repo: Adding a Salt master</a>
-			</div>
-			After I managed to provision an Nginx server using a masterless Salt setup, I felt it was time to introduce a master. This proved to be a frustrating challenge, but in the end I managed to do it. This post describes how I did it. It might save you some time.
-The goal  Given the current single-server setup, I want to reach the exact same result using a Salt master.
-			
-			  <div class="read-more-link">
-			    <a href="/fydp_website/posts/infra-as-repo-adding-salt-master/">...Read More...</a>
-			  </div>
-			
-		</li>
-	
-		<li class="tl-node">
-			<div class="tl-stamp">2013-07-28 00:00:00</div>
-			<div class="tl-content">
-				<a href="/fydp_website/posts/infra-as-repo-using-vagrant-and-salt/">Infra as a Repo: Using Vagrant and Salt Stack to deploy Nginx on DigitalOcean</a>
-			</div>
-			I believe that managing your infrastructure can and should be fun. Recently I have been toying around with Vagrant and Salt Stack to make this a reality. This weekend, I managed to combine these tools to automatically provision a new Nginx server on Digital Ocean.
-This in itself is nothing new - the interesting part is where I have published the entire script as a Github repository without sacrificing any security.
-			
-			  <div class="read-more-link">
-			    <a href="/fydp_website/posts/infra-as-repo-using-vagrant-and-salt/">...Read More...</a>
-			  </div>
-			
-		</li>
-	
-</ol>
-
-
-</body>
+  <body class="list-body">
+    <nav class="nav-bar side-padding">
+  <h1 class="nav-header"><a href="https://sebfio.github.io/fydp_website/" class="nav-text">
+    SoftTrac
+  </a></h1>
+  <div class="hamburger-menu">
+    <button onclick="hamburgerMenuPressed.call(this)" aria-haspopup="true" aria-expanded="false" aria-controls="menu" aria-label="Menu">
+      <span></span>
+      <span></span>
+    </button>
+    <ul id="menu" class="hamburger-menu-overlay">
+      <li><a href="https://sebfio.github.io/fydp_website/" class="hamburger-menu-overlay-link">Home</a></li>
+      
+      <li><a href="https://sebfio.github.io/fydp_website/about-us/" class="hamburger-menu-overlay-link">About Us</a></li>
+      
+      
+    </ul>
+  </div>
+</nav>
+    <main class="card-container side-gutter">
+      <header class="list-header">
+        <p class="list-header-subtext"></p>
+        <h1 class="list-header-title">Infra as a Repo</h1>
+      </header>
+      
+      
+      <a ontouchstart="cardPressed.call(this)" ontouchend="cardReleased.call(this)" ontouchmove="cardReleased.call(this)" 
+  href="https://sebfio.github.io/fydp_website/posts/infra-as-repo-securing-your/" class="card blog-card" rel="bookmark" >
+    
+  <article class="card-body">
+    <h2 class="card-title">Infra as a Repo: Securing your infrastructure with Salt</h2>
+    <p class="card-text">How to secure your servers with Salt.</p>
+    <div class="card-subtext muted-text">
+      <p>Posted <time datetime="2013-08-31">Aug 31, 2013</time></p>
+      <p></p>
+    </div>
+  </article>
+</a>
+      
+      <a ontouchstart="cardPressed.call(this)" ontouchend="cardReleased.call(this)" ontouchmove="cardReleased.call(this)" 
+  href="https://sebfio.github.io/fydp_website/posts/infra-as-repo-separating-master-from/" class="card blog-card" rel="bookmark" >
+    
+  <article class="card-body">
+    <h2 class="card-title">Infra as a Repo: Separating the Master from the Minion</h2>
+    <p class="card-text">How to provision a separate Salt master on Digital Ocean.</p>
+    <div class="card-subtext muted-text">
+      <p>Posted <time datetime="2013-08-11">Aug 11, 2013</time></p>
+      <p></p>
+    </div>
+  </article>
+</a>
+      
+      <a ontouchstart="cardPressed.call(this)" ontouchend="cardReleased.call(this)" ontouchmove="cardReleased.call(this)" 
+  href="https://sebfio.github.io/fydp_website/posts/infra-as-repo-adding-salt-master/" class="card blog-card" rel="bookmark" >
+    
+  <article class="card-body">
+    <h2 class="card-title">Infra as a Repo: Adding a Salt master</h2>
+    <p class="card-text">How to provision a salt master on Digital Ocean.</p>
+    <div class="card-subtext muted-text">
+      <p>Posted <time datetime="2013-08-09">Aug 9, 2013</time></p>
+      <p></p>
+    </div>
+  </article>
+</a>
+      
+      <a ontouchstart="cardPressed.call(this)" ontouchend="cardReleased.call(this)" ontouchmove="cardReleased.call(this)" 
+  href="https://sebfio.github.io/fydp_website/posts/infra-as-repo-using-vagrant-and-salt/" class="card blog-card" rel="bookmark" >
+    
+  <article class="card-body">
+    <h2 class="card-title">Infra as a Repo: Using Vagrant and Salt Stack to deploy Nginx on DigitalOcean</h2>
+    <p class="card-text">Provisioning an Nginx server on DigitalOcean using Vagrant and SaltStack</p>
+    <div class="card-subtext muted-text">
+      <p>Posted <time datetime="2013-07-28">Jul 28, 2013</time></p>
+      <p></p>
+    </div>
+  </article>
+</a>
+      
+    </main>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js" integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js" integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://sebfio.github.io/fydp_website/js/core.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+  </body>
 </html>

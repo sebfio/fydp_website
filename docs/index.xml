@@ -6,10 +6,19 @@
     <description>Recent content on ShopTrac&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 31 Aug 2013 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 10 Jan 2019 12:19:21 -0500</lastBuildDate>
     
 	<atom:link href="https://sebfio.github.io/fydp_website/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>About Us</title>
+      <link>https://sebfio.github.io/fydp_website/about-us/</link>
+      <pubDate>Thu, 10 Jan 2019 12:19:21 -0500</pubDate>
+      
+      <guid>https://sebfio.github.io/fydp_website/about-us/</guid>
+      <description>We&amp;rsquo;re a group of passionate 4 stream mechatronics students looking to revolutionize the way physical retail data is collected.</description>
+    </item>
     
     <item>
       <title>Infra as a Repo: Securing your infrastructure with Salt</title>
