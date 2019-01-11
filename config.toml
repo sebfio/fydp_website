@@ -5,7 +5,7 @@ theme = "aether"
 publishDir = "docs"
 
 [params]
-brand = "SoftTrac"
+brand = "ShopTrac"
 description = "The biggest revolution to physical retail since Amazon Go"
 homeimg = "tux.svg"
 bgimg = "wasteBanner.jpg"
